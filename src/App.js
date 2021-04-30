@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import SearchBar from './component/SearchBar';
+import SongList from './component/SongList';
+import axios from './api/jiosaavn';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { songslist: [] };
+    }
+
+    onFormSubmit = async text => {
+        console.log('Button clicked');
+        const songs = await axios.get('/search', {
+            params: { song: text }
+        });
+
+        this.setState({ songslist: songs.data });
+    }
+
+    render() {
+        return (
+            <div>
+                <SearchBar onFormSubmit = { this.onFormSubmit }/>
+                <SongList songlist={ this.state.songslist } />
+            </div>
+        );
+    }
 }
 
 export default App;
