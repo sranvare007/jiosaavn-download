@@ -11,12 +11,10 @@ class App extends React.Component {
     }
 
     onFormSubmit = async text => {
-        console.log('Button clicked');
         const songs = await axios.get('/songs', {
             params: { query: text }
         });
 
-        console.log(songs);
 
         if(songs?.data?.data?.results?.length > 0) {
             this.setState({ songslist: songs.data.data.results });
