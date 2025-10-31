@@ -1,0 +1,70 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to Vercel
+        id: deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Comment PR with deployment URL
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const deploymentUrl = '${{ steps.deploy.outputs.preview-url }}';
+            const comment = `## 🚀 Preview Deployment Ready!
+
+            Your preview deployment is ready at:
+            ### 🔗 ${deploymentUrl}
+
+            **Deployment Details:**
+            - **Branch:** \`${{ github.head_ref }}\`
+            - **Commit:** \`${{ github.sha }}\`
+            - **Deployed by:** @${{ github.actor }}
+
+            ---
+            *This deployment was automatically created by the Preview Deployment workflow.*`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+      - name: Display deployment URL
+        run: |
+          echo "::notice title=Preview Deployment::Preview URL: ${{ steps.deploy.outputs.preview-url }}"
+          echo "Preview URL: ${{ steps.deploy.outputs.preview-url }}"
