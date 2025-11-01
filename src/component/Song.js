@@ -14,7 +14,7 @@ class Song extends React.Component
                 <img className="ui small image" style={{ display: 'inline' }} alt={this.props.song.name} src={this.props.song.image[1].url} />
                 </div>
                 <div className="content">
-                    <a className="header">{ this.props.song.name }</a>
+                    <div className="header">{ this.props.song.name }</div>
                     <div className="meta">
                         <span className="date">{ this.props.song.artists.primary.map(artist => artist.name).join(', ') }</span>
                     </div>
@@ -24,9 +24,9 @@ class Song extends React.Component
 
                 </div>
                 <div className="extra content">
-                    <a>
+                    <span>
                         {this.props.song.year}
-                    </a>
+                    </span>
                 </div>
             </div>
         );

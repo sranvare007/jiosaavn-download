@@ -2,6 +2,7 @@ name: Preview Deployment
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - master
 
@@ -53,16 +54,39 @@ jobs:
             - **Branch:** \`${{ github.head_ref }}\`
             - **Commit:** \`${{ github.sha }}\`
             - **Deployed by:** @${{ github.actor }}
+            - **Updated:** ${new Date().toUTCString()}
 
             ---
             *This deployment was automatically created by the Preview Deployment workflow.*`;
 
-            github.rest.issues.createComment({
+            // Find existing comment from this workflow
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: comment
             });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Preview Deployment Ready')
+            );
+
+            // Update existing comment or create new one
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
 
       - name: Display deployment URL
         run: |
