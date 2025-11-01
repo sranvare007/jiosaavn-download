@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export default axios.create({
-    baseURL: 'https://saavn.dev/api/search',
+    baseURL: 'https://saavn.sumit.co/',
 });
   
