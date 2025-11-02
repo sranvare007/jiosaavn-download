@@ -10,10 +10,12 @@ class MusicPlayer extends React.Component {
             volume: 1,
             isMuted: false,
             previousVolume: 1,
-            hasAutoPlayed: false
+            hasAutoPlayed: false,
+            hasRestoredPosition: false
         };
         this.audioRef = React.createRef();
         this.animationFrameId = null;
+        this.lastSaveTime = 0;
     }
 
     componentDidMount() {
@@ -27,6 +29,11 @@ class MusicPlayer extends React.Component {
     }
 
     componentWillUnmount() {
+        // Save current position before unmounting
+        if (this.props.onPlaybackUpdate && this.state.currentTime > 0) {
+            this.props.onPlaybackUpdate(this.state.currentTime);
+        }
+
         // Clean up animation frame when component unmounts
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
@@ -48,12 +55,29 @@ class MusicPlayer extends React.Component {
             const audio = this.audioRef.current;
             if (audio) {
                 audio.load(); // Load the new source
-                this.setState({ currentTime: 0, duration: 0, hasAutoPlayed: false, isPlaying: false });
+                this.setState({
+                    currentTime: 0,
+                    duration: 0,
+                    hasAutoPlayed: false,
+                    isPlaying: false,
+                    hasRestoredPosition: false
+                });
             }
         }
     }
 
     handleCanPlay = () => {
+        const audio = this.audioRef.current;
+
+        // Restore saved playback position if available
+        if (!this.state.hasRestoredPosition && this.props.savedPlaybackTime > 0 && audio) {
+            audio.currentTime = this.props.savedPlaybackTime;
+            this.setState({
+                currentTime: this.props.savedPlaybackTime,
+                hasRestoredPosition: true
+            });
+        }
+
         // Auto-play when audio is ready (only once per song)
         if (!this.state.hasAutoPlayed) {
             this.setState({ hasAutoPlayed: true });
@@ -64,10 +88,19 @@ class MusicPlayer extends React.Component {
     updateProgress = () => {
         const audio = this.audioRef.current;
         if (audio && this.state.isPlaying) {
+            const currentTime = audio.currentTime;
             this.setState({
-                currentTime: audio.currentTime,
+                currentTime,
                 duration: audio.duration || 0
             });
+
+            // Save playback position every 2 seconds
+            const now = Date.now();
+            if (this.props.onPlaybackUpdate && (now - this.lastSaveTime > 2000)) {
+                this.props.onPlaybackUpdate(currentTime);
+                this.lastSaveTime = now;
+            }
+
             this.animationFrameId = requestAnimationFrame(this.updateProgress);
         }
     }
@@ -97,6 +130,11 @@ class MusicPlayer extends React.Component {
             this.setState({ isPlaying: false });
             if (this.animationFrameId) {
                 cancelAnimationFrame(this.animationFrameId);
+            }
+
+            // Save position when pausing
+            if (this.props.onPlaybackUpdate && audio.currentTime > 0) {
+                this.props.onPlaybackUpdate(audio.currentTime);
             }
         }
     }
@@ -165,6 +203,11 @@ class MusicPlayer extends React.Component {
     }
 
     handleClose = () => {
+        // Save position before closing
+        if (this.props.onPlaybackUpdate && this.state.currentTime > 0) {
+            this.props.onPlaybackUpdate(this.state.currentTime);
+        }
+
         this.pauseAudio();
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
@@ -205,7 +248,11 @@ class MusicPlayer extends React.Component {
                         if (this.animationFrameId) {
                             cancelAnimationFrame(this.animationFrameId);
                         }
-                        this.setState({ isPlaying: false });
+                        // Reset to beginning when song ends
+                        if (this.props.onPlaybackUpdate) {
+                            this.props.onPlaybackUpdate(0);
+                        }
+                        this.setState({ isPlaying: false, currentTime: 0 });
                     }}
                     onLoadedMetadata={this.handleTimeUpdate}
                     onCanPlay={this.handleCanPlay}

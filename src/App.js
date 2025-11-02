@@ -14,8 +14,47 @@ class App extends React.Component {
             loading: false,
             error: null,
             hasSearched: false,
-            currentSong: null
+            currentSong: null,
+            savedPlaybackTime: 0
         };
+    }
+
+
+    componentDidMount() {
+        // Load last played song from localStorage
+        this.loadLastPlayedSong();
+    }
+
+    loadLastPlayedSong = () => {
+        try {
+            const savedData = localStorage.getItem('jiosaavn_last_played');
+            if (savedData) {
+                const { song, playbackTime, wasClosedByUser } = JSON.parse(savedData);
+                // Only restore if user didn't explicitly close the player
+                if (song && !wasClosedByUser) {
+                    this.setState({
+                        currentSong: song,
+                        savedPlaybackTime: playbackTime || 0
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading saved song:', error);
+        }
+    }
+
+    saveCurrentSong = (song, playbackTime = 0, wasClosedByUser = false) => {
+        try {
+            const dataToSave = {
+                song,
+                playbackTime,
+                wasClosedByUser,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('jiosaavn_last_played', JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error saving song:', error);
+        }
     }
 
     onFormSubmit = async text => {
@@ -52,15 +91,29 @@ class App extends React.Component {
     }
 
     handleSongClick = (song) => {
-        this.setState({ currentSong: song });
+        this.setState({ currentSong: song, savedPlaybackTime: 0 });
+        // Mark as not closed by user when clicking a new song
+        this.saveCurrentSong(song, 0, false);
     }
 
     handleClosePlayer = () => {
+        // Mark as closed by user so it won't auto-restore on next app open
+        if (this.state.currentSong) {
+            this.saveCurrentSong(this.state.currentSong, this.state.savedPlaybackTime, true);
+        }
         this.setState({ currentSong: null });
     }
 
+    handlePlaybackUpdate = (currentTime) => {
+        // Save playback position every few seconds (not closed by user)
+        if (this.state.currentSong && currentTime > 0) {
+            this.setState({ savedPlaybackTime: currentTime });
+            this.saveCurrentSong(this.state.currentSong, currentTime, false);
+        }
+    }
+
     render() {
-        const { songslist, loading, error, hasSearched, currentSong } = this.state;
+        const { songslist, loading, error, hasSearched, currentSong, savedPlaybackTime } = this.state;
 
         return (
             <div className="app-container">
@@ -97,7 +150,9 @@ class App extends React.Component {
                 {currentSong && (
                     <MusicPlayer
                         song={currentSong}
+                        savedPlaybackTime={savedPlaybackTime}
                         onClose={this.handleClosePlayer}
+                        onPlaybackUpdate={this.handlePlaybackUpdate}
                     />
                 )}
             </div>
