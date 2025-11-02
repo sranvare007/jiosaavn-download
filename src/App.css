@@ -470,7 +470,10 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  min-width: 250px;
+  min-width: 200px;
+  max-width: 300px;
+  width: 300px;
+  flex-shrink: 0;
 }
 
 .player-album-art {
@@ -479,11 +482,13 @@ body {
   border-radius: 8px;
   object-fit: cover;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
 }
 
 .player-song-details {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .player-song-name {
@@ -494,6 +499,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .player-artist-name {
@@ -502,6 +508,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .player-controls {
@@ -623,7 +630,10 @@ body {
   align-items: center;
   gap: 0.75rem;
   min-width: 150px;
+  max-width: 180px;
+  width: 180px;
   color: white;
+  flex-shrink: 0;
 }
 
 .volume-icon-button {
@@ -716,8 +726,15 @@ body {
     padding: 1rem;
   }
 
+  .player-song-info {
+    max-width: 250px;
+    width: 250px;
+  }
+
   .player-volume {
     min-width: 120px;
+    max-width: 150px;
+    width: 150px;
   }
 }
 
@@ -729,6 +746,8 @@ body {
 
   .player-song-info {
     min-width: auto;
+    max-width: 200px;
+    width: auto;
     flex: 1;
   }
 
@@ -740,6 +759,8 @@ body {
 
   .player-volume {
     min-width: auto;
+    max-width: 120px;
+    width: auto;
     order: 2;
   }
 
@@ -749,6 +770,10 @@ body {
 }
 
 @media (max-width: 480px) {
+  .player-song-info {
+    max-width: 150px;
+  }
+
   .player-album-art {
     width: 50px;
     height: 50px;
