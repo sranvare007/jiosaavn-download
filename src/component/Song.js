@@ -1,37 +1,50 @@
 import React from 'react';
 
-class Song extends React.Component
-{
+class Song extends React.Component {
 
-    songRedirect = () => {
-        window.location.href = this.props.song.downloadUrl[2].url;
+    handleClick = () => {
+        this.props.onSongClick(this.props.song);
     }
-    render()
-    {
-        return (
-            <div className="card" onClick={this.songRedirect}>
-                <div className="image">
-                <img className="ui small image" style={{ display: 'inline' }} alt={this.props.song.name} src={this.props.song.image[1].url} />
-                </div>
-                <div className="content">
-                    <div className="header">{ this.props.song.name }</div>
-                    <div className="meta">
-                        <span className="date">{ this.props.song.artists.primary.map(artist => artist.name).join(', ') }</span>
-                    </div>
-                    <div className="description">
-                        {this.props.song.album.name}
-                    </div>
 
+    render() {
+        const { song } = this.props;
+
+        // Safely get image URL
+        const imageUrl = song.image?.[2]?.url || song.image?.[1]?.url || song.image?.[0]?.url || '';
+
+        // Safely get artist names
+        const artists = song.artists?.primary?.map(artist => artist.name).join(', ') || 'Unknown Artist';
+
+        // Safely get album name
+        const albumName = song.album?.name || 'Unknown Album';
+
+        // Safely get year
+        const year = song.year || 'N/A';
+
+        return (
+            <div className="song-card" onClick={this.handleClick}>
+                <div className="song-image-container">
+                    <img
+                        className="song-image"
+                        alt={song.name}
+                        src={imageUrl}
+                        loading="lazy"
+                    />
+                    <div className="song-play-overlay">
+                        <div className="play-icon">▶</div>
+                    </div>
                 </div>
-                <div className="extra content">
-                    <span>
-                        {this.props.song.year}
-                    </span>
+                <div className="song-content">
+                    <h3 className="song-title">{song.name}</h3>
+                    <p className="song-artist">{artists}</p>
+                    <div className="song-details">
+                        <span className="song-album">{albumName}</span>
+                        <span className="song-year">{year}</span>
+                    </div>
                 </div>
             </div>
         );
     }
-};
-
+}
 
 export default Song;

@@ -2,14 +2,30 @@ import React from 'react';
 import Song from './Song';
 
 const SongList = (props) => {
+    const { songlist, onSongClick } = props;
 
-    const songlist = props.songlist.map(song => {
-        return <Song key={song.song_id} song={song} />
-    });
+    if (!songlist || songlist.length === 0) {
+        return (
+            <div className="empty-state">
+                <div className="empty-state-icon">🎵</div>
+                <p className="empty-state-text">No songs found. Try searching for something else!</p>
+            </div>
+        );
+    }
+
+    const songs = songlist.map(song => (
+        <Song
+            key={song.id || song.song_id}
+            song={song}
+            onSongClick={onSongClick}
+        />
+    ));
 
     return (
-        <div className="ui cards" style={{ padding: '20px' }}>
-            {songlist}
+        <div className="songs-container">
+            <div className="songs-grid">
+                {songs}
+            </div>
         </div>
     );
 };
