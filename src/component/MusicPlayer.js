@@ -3,13 +3,17 @@ import React from 'react';
 class MusicPlayer extends React.Component {
     constructor(props) {
         super(props);
+
+        // Load saved volume settings
+        const savedSettings = this.loadVolumeSettings();
+
         this.state = {
             isPlaying: false,
             currentTime: 0,
             duration: 0,
-            volume: 1,
-            isMuted: false,
-            previousVolume: 1,
+            volume: savedSettings.volume,
+            isMuted: savedSettings.isMuted,
+            previousVolume: savedSettings.volume,
             hasAutoPlayed: false,
             hasRestoredPosition: false
         };
@@ -18,11 +22,38 @@ class MusicPlayer extends React.Component {
         this.lastSaveTime = 0;
     }
 
+    loadVolumeSettings = () => {
+        try {
+            const saved = localStorage.getItem('jiosaavn_volume_settings');
+            if (saved) {
+                const { volume, isMuted } = JSON.parse(saved);
+                return {
+                    volume: volume !== undefined ? volume : 1,
+                    isMuted: isMuted !== undefined ? isMuted : false
+                };
+            }
+        } catch (error) {
+            console.error('Error loading volume settings:', error);
+        }
+        return { volume: 1, isMuted: false };
+    }
+
+    saveVolumeSettings = (volume, isMuted) => {
+        try {
+            const settings = { volume, isMuted };
+            localStorage.setItem('jiosaavn_volume_settings', JSON.stringify(settings));
+        } catch (error) {
+            console.error('Error saving volume settings:', error);
+        }
+    }
+
     componentDidMount() {
         // When component first mounts with a song, prepare to autoplay
         if (this.props.song) {
             const audio = this.audioRef.current;
             if (audio) {
+                // Apply saved volume settings to audio element
+                audio.volume = this.state.isMuted ? 0 : this.state.volume;
                 audio.load();
             }
         }
@@ -54,6 +85,8 @@ class MusicPlayer extends React.Component {
             // Reset audio and prepare for new song
             const audio = this.audioRef.current;
             if (audio) {
+                // Preserve volume settings when loading new song
+                audio.volume = this.state.isMuted ? 0 : this.state.volume;
                 audio.load(); // Load the new source
                 this.setState({
                     currentTime: 0,
@@ -171,11 +204,14 @@ class MusicPlayer extends React.Component {
         const volume = parseFloat(e.target.value);
         if (audio) {
             audio.volume = volume;
+            const isMuted = volume === 0;
             this.setState({
                 volume,
-                isMuted: volume === 0,
+                isMuted,
                 previousVolume: volume > 0 ? volume : this.state.previousVolume
             });
+            // Save volume settings
+            this.saveVolumeSettings(volume, isMuted);
         }
     }
 
@@ -190,6 +226,8 @@ class MusicPlayer extends React.Component {
                     volume: volumeToRestore,
                     isMuted: false
                 });
+                // Save unmuted state
+                this.saveVolumeSettings(volumeToRestore, false);
             } else {
                 // Mute: save current volume and set to 0
                 this.setState({
@@ -198,6 +236,8 @@ class MusicPlayer extends React.Component {
                     isMuted: true
                 });
                 audio.volume = 0;
+                // Save muted state
+                this.saveVolumeSettings(0, true);
             }
         }
     }
