@@ -11,7 +11,7 @@ class App extends React.Component {
     }
 
     onFormSubmit = async text => {
-        const songs = await axios.get('/songs', {
+        const songs = await axios.get('/api/search/songs', {
             params: { query: text }
         });
 
