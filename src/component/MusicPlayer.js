@@ -299,6 +299,9 @@ class MusicPlayer extends React.Component {
                                 value={currentTime}
                                 onChange={this.handleSeek}
                                 className="progress-bar"
+                                style={{
+                                    background: `linear-gradient(to right, white 0%, white ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255, 255, 255, 0.3) ${duration > 0 ? (currentTime / duration) * 100 : 0}%, rgba(255, 255, 255, 0.3) 100%)`
+                                }}
                             />
                             <span className="time-display">{this.formatTime(duration)}</span>
                         </div>
@@ -341,6 +344,9 @@ class MusicPlayer extends React.Component {
                             value={volume}
                             onChange={this.handleVolumeChange}
                             className="volume-slider"
+                            style={{
+                                background: `linear-gradient(to right, white 0%, white ${volume * 100}%, rgba(255, 255, 255, 0.3) ${volume * 100}%, rgba(255, 255, 255, 0.3) 100%)`
+                            }}
                         />
                     </div>
 

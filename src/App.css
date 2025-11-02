@@ -570,12 +570,12 @@ body {
   flex: 1;
   height: 6px;
   border-radius: 3px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.3);
   outline: none;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
-  transition: all 0.1s linear;
+  transition: background 0.1s linear;
 }
 
 .progress-bar::-webkit-slider-thumb {
@@ -613,13 +613,13 @@ body {
 }
 
 .progress-bar::-webkit-slider-runnable-track {
-  background: rgba(255, 255, 255, 0.3);
+  background: transparent;
   height: 6px;
   border-radius: 3px;
 }
 
 .progress-bar::-moz-range-track {
-  background: rgba(255, 255, 255, 0.3);
+  background: transparent;
   height: 6px;
   border-radius: 3px;
   border: none;
@@ -667,6 +667,7 @@ body {
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  transition: background 0.1s linear;
 }
 
 .volume-slider::-webkit-slider-thumb {
@@ -678,6 +679,12 @@ body {
   background: white;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-top: -5px;
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }
 
 .volume-slider::-moz-range-thumb {
@@ -688,6 +695,24 @@ body {
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.volume-slider::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.volume-slider::-moz-range-track {
+  background: transparent;
+  height: 4px;
+  border-radius: 2px;
+  border: none;
 }
 
 .player-close-button {
