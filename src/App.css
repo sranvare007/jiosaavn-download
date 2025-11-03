@@ -212,6 +212,7 @@ body {
 
 /* Song Card */
 .song-card {
+  position: relative;
   background: var(--bg-white);
   border-radius: 16px;
   overflow: hidden;
@@ -334,6 +335,67 @@ body {
   flex-shrink: 0;
 }
 
+/* Download Button */
+.song-download-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: scale(0.8);
+  z-index: 10;
+}
+
+.song-card:hover .song-download-button {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.song-download-button:hover {
+  background: var(--primary-gradient);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.song-download-button:active {
+  transform: scale(0.95);
+}
+
+.song-download-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.song-download-button svg {
+  transition: transform 0.2s ease;
+}
+
+.song-download-button:hover svg {
+  transform: translateY(2px);
+}
+
+.song-download-button:disabled:hover {
+  transform: scale(1);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-color);
+}
+
+.song-download-button:disabled svg {
+  transform: none;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {
@@ -378,6 +440,9 @@ body {
 }
 
 @keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
   to {
     transform: rotate(360deg);
   }
@@ -433,6 +498,16 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
   }
+
+  /* Make download button always visible on mobile (no hover) */
+  .song-download-button {
+    opacity: 1;
+    transform: scale(1);
+    width: 40px;
+    height: 40px;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -442,6 +517,19 @@ body {
 
   .app-container {
     padding: 1rem 0.5rem;
+  }
+
+  /* Smaller download button on very small screens */
+  .song-download-button {
+    width: 36px;
+    height: 36px;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .song-download-button svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
