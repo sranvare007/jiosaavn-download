@@ -116,7 +116,7 @@ class App extends React.Component {
         const { songslist, loading, error, hasSearched, currentSong, savedPlaybackTime } = this.state;
 
         return (
-            <div className="app-container">
+            <div className={`app-container ${currentSong ? 'player-active' : ''}`}>
                 <header className="app-header">
                     <h1 className="app-title">JioSaavn</h1>
                     <p className="app-subtitle">Discover and download your favorite music</p>
