@@ -39,7 +39,12 @@ body {
 .app-container {
   min-height: 100vh;
   padding: 2rem 1rem;
+  padding-bottom: 2rem;
   background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+}
+
+.app-container.player-active {
+  padding-bottom: 140px;
 }
 
 /* Header */
@@ -184,6 +189,7 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem;
+  padding-bottom: 2rem;
 }
 
 .songs-grid {
@@ -852,6 +858,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .app-container.player-active {
+    padding-bottom: 180px;
+  }
+
   .player-content {
     flex-wrap: wrap;
     padding: 0.75rem 1rem;
@@ -883,6 +893,10 @@ body {
 }
 
 @media (max-width: 480px) {
+  .app-container.player-active {
+    padding-bottom: 160px;
+  }
+
   .player-song-info {
     max-width: 150px;
   }
